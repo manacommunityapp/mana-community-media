@@ -1,0 +1,38 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mana_media_test
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+  flyway:
+    enabled: false   # Use ddl-auto in tests
+
+media:
+  jwt:
+    secret: test-secret-key-32-characters-long
+    issuer: mana-community-auth
+
+  s3:
+    region: us-east-1
+    bucket-public:  test-public-bucket
+    bucket-private: test-private-bucket
+    access-key: test-access-key
+    secret-key: test-secret-key
+    cdn-base-url: https://cdn.test.mana.community
+    presigned-url-ttl: PT15M
+    upload-presigned-ttl: PT5M
+    max-file-size-bytes: 10485760  # 10 MB for tests
+    allowed-mime-types:
+      - image/jpeg
+      - image/png
+      - image/webp
+      - application/pdf
+
+logging:
+  level:
+    com.manacommunity.media: DEBUG
