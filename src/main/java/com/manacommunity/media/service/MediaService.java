@@ -295,7 +295,8 @@ public class MediaService {
                 f.getOriginalName(), f.getS3Key(), f.getMimeType(), f.getSizeBytes(),
                 f.getMediaType(), f.getAccessLevel(), f.getCdnUrl(),
                 f.getWidthPx(), f.getHeightPx(), f.getThumbnailCdnUrl(),
-                f.getStatus(), f.getCreatedAt(), f.getUpdatedAt()
+                f.getStatus(), f.getModerationStatus(), f.getRetentionTier(),
+                f.getCreatedAt(), f.getUpdatedAt()
         );
     }
 }

@@ -41,4 +41,12 @@ public interface MediaFileRepository extends JpaRepository<MediaFile, Long> {
     Long sumActiveSizeBytesByCommunity(@Param("communityId") Long communityId);
 
     List<MediaFile> findByStatusAndDeletedAtBefore(FileStatus status, Instant before);
+
+    Page<MediaFile> findByCommunityIdAndModerationStatus(Long communityId, ModerationStatus moderationStatus, Pageable pageable);
+
+    Page<MediaFile> findByModerationStatus(ModerationStatus moderationStatus, Pageable pageable);
+
+    List<MediaFile> findByRetentionTierAndRetentionExpiresAtBefore(RetentionTier retentionTier, Instant expiresBefore);
+
+    List<MediaFile> findByStatusAndCreatedAtBefore(FileStatus status, Instant cutoff);
 }

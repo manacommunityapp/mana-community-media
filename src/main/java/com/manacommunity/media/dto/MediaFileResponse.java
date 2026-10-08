@@ -23,6 +23,20 @@ public record MediaFileResponse(
         Integer heightPx,
         String thumbnailCdnUrl,  // null if not an image or not yet processed
         FileStatus status,
+        ModerationStatus moderationStatus,
+        RetentionTier retentionTier,
         Instant createdAt,
         Instant updatedAt
-) {}
+) {
+    public MediaFileResponse(
+            Long id, Long communityId, OwnerType ownerType, Long ownerId,
+            String originalName, String s3Key, String mimeType, Long sizeBytes,
+            MediaType mediaType, AccessLevel accessLevel, String cdnUrl,
+            Integer widthPx, Integer heightPx, String thumbnailCdnUrl,
+            FileStatus status, Instant createdAt, Instant updatedAt) {
+        this(id, communityId, ownerType, ownerId, originalName, s3Key, mimeType,
+             sizeBytes, mediaType, accessLevel, cdnUrl, widthPx, heightPx,
+             thumbnailCdnUrl, status, ModerationStatus.APPROVED, RetentionTier.STANDARD,
+             createdAt, updatedAt);
+    }
+}

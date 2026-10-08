@@ -13,8 +13,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.mock.web.MockMultipartFile;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +27,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @DisplayName("MediaService unit tests")
 class MediaServiceTest {
 
@@ -31,6 +35,7 @@ class MediaServiceTest {
     @Mock private ImageProcessingService   imageService;
     @Mock private MediaFileRepository      repository;
     @Mock private S3Properties             s3Props;
+    @org.mockito.Spy private org.apache.tika.Tika tika = new org.apache.tika.Tika();
     @InjectMocks private MediaService      mediaService;
 
     private static final Long COMMUNITY_ID = 1L;
@@ -50,7 +55,7 @@ class MediaServiceTest {
     @Test
     @DisplayName("uploadFile: persists PUBLIC media record with CDN URL")
     void uploadFile_public_createsCdnUrl() {
-        byte[] fakeBytes = new byte[]{(byte) 0xFF, (byte) 0xD8}; // JPEG magic bytes
+        byte[] fakeBytes = new byte[]{(byte) 0xFF, (byte) 0xD8, (byte) 0xFF, (byte) 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01};
 
         MockMultipartFile mockFile = new MockMultipartFile(
                 "file", "avatar.jpg", "image/jpeg", fakeBytes);
@@ -84,7 +89,7 @@ class MediaServiceTest {
     @Test
     @DisplayName("uploadFile: PRIVATE media has null CDN URL")
     void uploadFile_private_nullCdnUrl() {
-        byte[] fakeBytes = "pdf content".getBytes();
+        byte[] fakeBytes = "%PDF-1.4\n%trailer\n%%EOF".getBytes(StandardCharsets.UTF_8);
         MockMultipartFile mockFile = new MockMultipartFile(
                 "file", "doc.pdf", "application/pdf", fakeBytes);
 

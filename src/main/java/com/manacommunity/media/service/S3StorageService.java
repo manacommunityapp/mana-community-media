@@ -112,6 +112,12 @@ public class S3StorageService {
         log.info("Deleted s3://{}/{}", bucket, key);
     }
 
+    public void deleteObject(String key) {
+        if (key == null) return;
+        String bucket = key.startsWith("public") ? props.bucketPublic() : props.bucketPrivate();
+        deleteObject(bucket, key);
+    }
+
     // ─── Existence Check ─────────────────────────────────────────────────────
 
     public boolean objectExists(String bucket, String key) {

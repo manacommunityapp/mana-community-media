@@ -20,6 +20,8 @@ import java.time.Instant;
         @Index(name = "idx_media_access_level", columnList = "access_level"),
         @Index(name = "idx_media_media_type",   columnList = "media_type"),
         @Index(name = "idx_media_status",       columnList = "status"),
+        @Index(name = "idx_media_moderation",   columnList = "moderation_status"),
+        @Index(name = "idx_media_retention",    columnList = "retention_tier, retention_expires_at"),
 })
 @Getter
 @Setter
@@ -108,6 +110,38 @@ public class MediaFile {
     @Column(name = "etag", length = 256)
     private String etag;
 
+    /** Moderation status of this media item. */
+    @Column(name = "moderation_status", nullable = false, length = 30)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private ModerationStatus moderationStatus = ModerationStatus.APPROVED;
+
+    /** Automated confidence score (0.0 to 1.0) indicating safety/toxicity. */
+    @Column(name = "moderation_score")
+    private Double moderationScore;
+
+    /** Comma-separated rule violation flags, e.g. "NSFW,SPAM". */
+    @Column(name = "moderation_flags", length = 500)
+    private String moderationFlags;
+
+    /** Admin user ID who reviewed or null if automated. */
+    @Column(name = "moderated_by")
+    private Long moderatedBy;
+
+    /** Timestamp of review. */
+    @Column(name = "moderated_at")
+    private Instant moderatedAt;
+
+    /** Storage retention tier. */
+    @Column(name = "retention_tier", nullable = false, length = 30)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private RetentionTier retentionTier = RetentionTier.STANDARD;
+
+    /** Expiry timestamp for automatic archiving or purging. */
+    @Column(name = "retention_expires_at")
+    private Instant retentionExpiresAt;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -123,11 +157,13 @@ public class MediaFile {
     // ─── Enumerations ────────────────────────────────────────────────────────
 
     public enum OwnerType {
-        USER, COMMUNITY, TOURNAMENT, EVENT, POST, ANNOUNCEMENT, TEAM
+        USER, COMMUNITY, TOURNAMENT, EVENT, POST, ANNOUNCEMENT, TEAM,
+        FEED, MARKETPLACE, SPORTS, PROFILE, DOCUMENTS, EMERGENCY, HELPDESK, ANPR, VENDOR, FOOD, LEARNING
     }
 
     public enum MediaType {
-        AVATAR, BANNER, GALLERY_IMAGE, DOCUMENT, VIDEO, ATTACHMENT, LOGO, THUMBNAIL
+        AVATAR, BANNER, GALLERY_IMAGE, DOCUMENT, VIDEO, ATTACHMENT, LOGO, THUMBNAIL,
+        PRODUCT_IMAGE, KYC_DOCUMENT, SOS_EVIDENCE, VEHICLE_PLATE, WORK_ORDER_PHOTO, MENU_ITEM_IMAGE, COURSE_MATERIAL, CERTIFICATE_ASSET
     }
 
     public enum AccessLevel {
@@ -136,5 +172,13 @@ public class MediaFile {
 
     public enum FileStatus {
         PENDING_UPLOAD, ACTIVE, SOFT_DELETED, HARD_DELETED
+    }
+
+    public enum ModerationStatus {
+        PENDING, APPROVED, FLAGGED, REJECTED, QUARANTINED
+    }
+
+    public enum RetentionTier {
+        STANDARD, ARCHIVED, COLD_STORAGE, EXPIRED
     }
 }
